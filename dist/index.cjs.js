@@ -5,7 +5,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var react = require('react');
 var jsxRuntime = require('react/jsx-runtime');
 
-/*! *****************************************************************************
+/******************************************************************************
 Copyright (c) Microsoft Corporation.
 
 Permission to use, copy, modify, and/or distribute this software for any
@@ -95,8 +95,7 @@ var iFetch = function (payload) { return __awaiter(void 0, void 0, void 0, funct
                 _e.label = 1;
             case 1:
                 _e.trys.push([1, 15, , 16]);
-                return [4 /*yield*/, fetch(url, __assign({ body: body,
-                        method: method }, rest))];
+                return [4 /*yield*/, fetch(url, __assign({ body: body, method: method }, rest))];
             case 2:
                 httpResponse = _e.sent();
                 _d = responseContentType;
@@ -149,8 +148,9 @@ var iFetch = function (payload) { return __awaiter(void 0, void 0, void 0, funct
 var FetchContext = react.createContext({});
 var FetchProvider = function (_a) {
     var children = _a.children, _b = _a.getAuthorizationHeader, getAuthorizationHeader = _b === void 0 ? function () { return ""; } : _b, rest = __rest(_a, ["children", "getAuthorizationHeader"]);
-    return (jsxRuntime.jsx(FetchContext.Provider, __assign({ value: __assign({ getAuthorizationHeader: getAuthorizationHeader }, rest) }, { children: children }), void 0));
+    return (jsxRuntime.jsx(FetchContext.Provider, __assign({ value: __assign({ getAuthorizationHeader: getAuthorizationHeader }, rest) }, { children: children })));
 };
+FetchProvider.defaultProps = {};
 var useFetchContext = function () {
     var context = react.useContext(FetchContext);
     if (context === undefined) {
@@ -194,7 +194,7 @@ var useFetch = function (params) {
     var request = react.useCallback(function (payload) {
         if (payload === void 0) { payload = {}; }
         var _url = payload.url, endpoint = payload.endpoint, payloadOnSuccess = payload.onSuccess, payloadOnError = payload.onError, payloadHeaders = payload.headers, _credentials = payload.credentials, rest = __rest(payload, ["url", "endpoint", "onSuccess", "onError", "headers", "credentials"]);
-        var url = "" + (_url || contextURL) + endpoint;
+        var url = "".concat(_url || contextURL).concat(endpoint);
         if (onRequest)
             onRequest(__assign(__assign({}, payload), { url: url }));
         setData(function (old) { return (__assign(__assign({}, old), { fetching: true, fetched: false })); });
@@ -202,8 +202,7 @@ var useFetch = function (params) {
         var headers = __assign({ "Authorization": authorizationHeader }, (payloadHeaders || {}));
         if (!headers["Authorization"])
             delete headers["Authorization"];
-        return iFetch(__assign(__assign({}, rest), { url: url,
-            headers: headers, credentials: _credentials || credentials, onSuccess: function (response) {
+        return iFetch(__assign(__assign({}, rest), { url: url, headers: headers, credentials: _credentials || credentials, onSuccess: function (response) {
                 if (!isSuccess || isSuccess(response)) {
                     onSuccess({
                         onSuccess: payloadOnSuccess,

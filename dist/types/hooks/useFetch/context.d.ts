@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, PropsWithChildren } from "react";
 import { RequestPayload } from ".";
 interface FetchContextProps {
     url?: string;
@@ -11,6 +11,6 @@ interface FetchContextProps {
     onError?: (error: any) => void;
     getAuthorizationHeader?: () => string;
 }
-declare const FetchProvider: FC<FetchContextProps>;
+declare const FetchProvider: FC<PropsWithChildren<FetchContextProps>>;
 export declare const useFetchContext: () => FetchContextProps;
 export default FetchProvider;

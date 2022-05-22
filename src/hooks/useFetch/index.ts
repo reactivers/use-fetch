@@ -20,7 +20,7 @@ export interface FetchController<T extends {}> {
     fetched: boolean;
     fetching: boolean;
     success: boolean;
-    response: T | any;
+    response: T;
 }
 
 export interface IUseFetchProps {
@@ -51,7 +51,7 @@ const useFetch: <T extends {}>(params?: IUseFetchProps) => IUseFetchResponse<T> 
         firstTimeFetched: false,
         fetched: false,
         fetching: false,
-        response: {}
+        response: {} as T
     });
 
     const abortController = useMemo(() => new AbortController(), []);

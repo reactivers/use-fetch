@@ -1,4 +1,4 @@
-import { createContext, FC, useContext } from "react";
+import { createContext, FC, PropsWithChildren, useContext } from "react";
 import { RequestPayload } from ".";
 
 interface FetchContextProps {
@@ -15,7 +15,7 @@ interface FetchContextProps {
 
 const FetchContext = createContext({} as FetchContextProps);
 
-const FetchProvider: FC<FetchContextProps> = ({ children, getAuthorizationHeader = () => "", ...rest }) => {
+const FetchProvider: FC<PropsWithChildren<FetchContextProps>> = ({ children, getAuthorizationHeader = () => "", ...rest }) => {
     return (
         <FetchContext.Provider value={{
             getAuthorizationHeader,
@@ -24,6 +24,10 @@ const FetchProvider: FC<FetchContextProps> = ({ children, getAuthorizationHeader
             {children}
         </FetchContext.Provider>
     )
+}
+
+FetchProvider.defaultProps = {
+
 }
 
 export const useFetchContext = () => {

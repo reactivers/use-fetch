@@ -15,7 +15,7 @@ export interface FetchController<T extends {}> {
     fetched: boolean;
     fetching: boolean;
     success: boolean;
-    response: T | any;
+    response: T;
 }
 export interface IUseFetchProps {
     abortOnUnmount?: boolean;
