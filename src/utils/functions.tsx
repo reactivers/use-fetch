@@ -36,6 +36,12 @@ export const iFetch = async (payload: IFetch) => {
             method,
             ...rest
         })
+        const statusCode = `${httpResponse.status}`;
+
+        if (statusCode.startsWith('4', 0) || statusCode.startsWith('5', 0)) {
+            onError(httpResponse);
+            return;
+        }
 
         switch (responseContentType) {
             case "JSON":

@@ -1,7 +1,7 @@
 {
   "name": "@reactivers/use-fetch",
   "description": "All HTTP Fetch requests in React. Awesome React useFetch hook!",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "keywords": [
     "hooks",
     "react",
