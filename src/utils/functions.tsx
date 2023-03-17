@@ -37,13 +37,12 @@ export const iFetch = async (payload: IFetch) => {
   const body = stringify ? JSON.stringify(_body) : _body;
 
   try {
-    const httpResponse = (
-      await fetch(url, {
-        body,
-        method,
-        ...rest,
-      })
-    ).clone();
+    const _httpResponse = await fetch(url, {
+      body,
+      method,
+      ...rest,
+    });
+    const httpResponse = _httpResponse.clone();
     const statusCode = `${httpResponse.status}`;
 
     if (statusCode.startsWith("4", 0) || statusCode.startsWith("5", 0)) {
@@ -76,7 +75,7 @@ export const iFetch = async (payload: IFetch) => {
         onSuccess(httpResponse);
     }
 
-    return httpResponse;
+    return _httpResponse;
   } catch (error) {
     onError(error);
   }
