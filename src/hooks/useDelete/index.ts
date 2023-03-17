@@ -1,21 +1,36 @@
-import { useCallback } from 'react';
-import { applicationJSONHeader } from '../../utils/functions';
-import useFetch, { RequestPayload, IUseFetchProps, IUseFetchResponse } from '../useFetch';
+import { useCallback } from "react";
+import { applicationJSONHeader } from "../../utils/functions";
+import useFetch, {
+  RequestPayload,
+  IUseFetchProps,
+  IUseFetchResponse,
+} from "../useFetch";
 
 interface DeleteRequestPayload extends RequestPayload {
-    params?: any;
+  params?: any;
 }
 
-const useDelete: <T extends {}>(params?: IUseFetchProps) => IUseFetchResponse<T> = <T extends {}>(params = { abortOnUnmount: true }) => {
-    const { request, ...rest } = useFetch<T>(params)
-    const deleteRequest = useCallback((payload: DeleteRequestPayload = {}) => {
-        return request({ headers: applicationJSONHeader, ...payload, method: "DELETE" })
-    }, [request])
+const useDelete: <T extends {}>(
+  params?: IUseFetchProps
+) => IUseFetchResponse<T> = <T extends {}>(
+  params = { abortOnUnmount: true }
+) => {
+  const { request, ...rest } = useFetch<T>(params);
+  const deleteRequest = useCallback(
+    (payload: DeleteRequestPayload = {}) => {
+      return request({
+        headers: applicationJSONHeader,
+        ...payload,
+        method: "DELETE",
+      });
+    },
+    [request]
+  );
 
-    return {
-        request: deleteRequest,
-        ...rest
-    }
-}
+  return {
+    request: deleteRequest,
+    ...rest,
+  };
+};
 
-export default useDelete
+export default useDelete;
