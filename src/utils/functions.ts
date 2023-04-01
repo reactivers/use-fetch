@@ -52,6 +52,7 @@ export const iFetch = async <T extends IFetchResponseType>(
     } else {
       onSuccess(httpResponse as T);
     }
+
     return _httpResponse;
   } catch (error) {
     onError(error);
