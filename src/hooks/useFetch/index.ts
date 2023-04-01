@@ -84,7 +84,7 @@ const useFetch: <T extends IFetchJSONType>(
     );
 
   const checkParams = (payload: RequestPayload<T>) => {
-    if (payload.url === undefined && contextURL) {
+    if (payload.url === undefined && contextURL === undefined) {
       throw Error(
         "@reactivers/use-fetch => URL is undefined. Make sure you defined the url in the context or hook!",
       );
