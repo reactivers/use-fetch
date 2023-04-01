@@ -1,24 +1,24 @@
 import { useCallback } from "react";
-import useFetch, {
-  GenericRequestPayload,
+import {
+  IFetchJSONType,
   IUseFetchProps,
   IUseFetchResponse,
-} from "../useFetch";
+  RequestPayload,
+} from "../../utils/types";
+import useFetch from "../useFetch";
 
-interface GetRequestPayload extends GenericRequestPayload {}
-
-const useGet: <T extends {}>(
-  params?: IUseFetchProps
-) => IUseFetchResponse<T> = <T extends {}>(
-  params = { abortOnUnmount: true }
+const useGet: <T extends IFetchJSONType>(
+  params?: IUseFetchProps,
+) => IUseFetchResponse<T> = <T extends IFetchJSONType>(
+  params?: IUseFetchProps,
 ) => {
   const { request, ...rest } = useFetch<T>(params);
 
   const getRequest = useCallback(
-    (payload: GetRequestPayload = {}) => {
+    (payload: RequestPayload<T>) => {
       return request({ ...payload, method: "GET" });
     },
-    [request]
+    [request],
   );
 
   return {

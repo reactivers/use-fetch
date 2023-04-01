@@ -1,28 +1,28 @@
 import { useCallback } from "react";
-import { applicationJSONHeader } from "../../utils/functions";
-import useFetch, {
-  RequestPayload,
+import { applicationJSONHeader } from "../../utils/constants";
+import {
+  IFetchResponseType,
   IUseFetchProps,
   IUseFetchResponse,
-} from "../useFetch";
+  RequestPayload,
+} from "../../utils/types";
+import useFetch from "../useFetch";
 
-interface PostRequestPayload extends RequestPayload {}
-
-const usePost: <T extends {}>(
-  params?: IUseFetchProps
-) => IUseFetchResponse<T> = <T extends {}>(
-  params = { abortOnUnmount: true }
+const usePost: <T extends IFetchResponseType>(
+  params?: IUseFetchProps,
+) => IUseFetchResponse<T> = <T extends IFetchResponseType>(
+  params?: IUseFetchProps,
 ) => {
   const { request, ...rest } = useFetch<T>(params);
   const postRequest = useCallback(
-    (payload: PostRequestPayload = {}) => {
+    (payload: RequestPayload<T>) => {
       return request({
         headers: applicationJSONHeader,
         ...payload,
         method: "POST",
       });
     },
-    [request]
+    [request],
   );
 
   return {

@@ -1,43 +1,22 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { iFetch, ResponseContentType } from "../../utils/functions";
-import { useFetchContext } from "./context";
+import { iFetch } from "../../utils/functions";
+import {
+  FetchController,
+  IFetchJSONType,
+  IFetchOnError,
+  IFetchOnSuccess,
+  IUseFetchProps,
+  IUseFetchResponse,
+  RequestPayload,
+} from "../../utils/types";
+import { useFetchContext } from "./hook";
 
-export interface GenericRequestPayload extends RequestInit {
-  url?: string;
-  endpoint?: string;
-  onSuccess?: (respose: any) => void;
-  onError?: (error: any) => void;
-  responseContentType?: ResponseContentType;
-}
-
-export interface RequestPayload extends GenericRequestPayload {
-  body?: any;
-  bodyStringify?: boolean;
-}
-
-export interface FetchController<T extends {}> {
-  firstTimeFetched: boolean;
-  fetched: boolean;
-  fetching: boolean;
-  success: boolean;
-  response: T;
-}
-
-export interface IUseFetchProps {
-  abortOnUnmount?: boolean;
-}
-
-export interface IUseFetchResponse<T extends {}> extends FetchController<T> {
-  request: (params: RequestPayload) => Promise<Response>;
-}
-
-const useFetch: <T extends {}>(
-  params?: IUseFetchProps
-) => IUseFetchResponse<T> = <T extends {}>(
-  params = { abortOnUnmount: true }
+const useFetch: <T extends IFetchJSONType>(
+  params?: IUseFetchProps,
+) => IUseFetchResponse<T> = <T extends IFetchJSONType>(
+  params?: IUseFetchProps,
 ) => {
-  const { abortOnUnmount } = params;
-
+  const { abortOnUnmount } = params || { abortOnUnmount: true };
   const {
     url: contextURL,
     onSuccess: contextOnSuccess,
@@ -60,9 +39,14 @@ const useFetch: <T extends {}>(
 
   const abortController = useMemo(() => new AbortController(), []);
 
-  const onSuccess = useCallback(
+  const onSuccess: (params: {
+    onSuccess?: IFetchOnSuccess<T>;
+    response: T;
+  }) => void = useCallback(
     ({ onSuccess: payloadOnSuccess, response }) => {
-      if (transformResponse) response = transformResponse(response);
+      response = transformResponse
+        ? (transformResponse(response) as T)
+        : response;
 
       if (contextOnSuccess) contextOnSuccess(response);
       if (payloadOnSuccess) payloadOnSuccess(response);
@@ -70,36 +54,51 @@ const useFetch: <T extends {}>(
       setData((oldData) => ({
         ...oldData,
         success: true,
-        response,
+        response: response,
         fetching: false,
         fetched: true,
         firstTimeFetched: true,
       }));
     },
-    [contextOnSuccess, transformResponse]
+    [contextOnSuccess, transformResponse],
   );
 
-  const onError = useCallback(
-    ({ onError: payloadOnError, response }) => {
-      if (transformResponse) response = transformResponse(response);
+  const onError: (params: { onError?: IFetchOnError; response: T }) => void =
+    useCallback(
+      ({ onError: payloadOnError, response }) => {
+        if (transformResponse) response = transformResponse(response) as T;
 
-      if (contextOnError) contextOnError(response);
-      if (payloadOnError) payloadOnError(response);
+        if (contextOnError) contextOnError(response as never);
+        if (payloadOnError) payloadOnError(response);
 
-      setData((oldData) => ({
-        ...oldData,
-        success: false,
-        response,
-        fetching: false,
-        fetched: true,
-        firstTimeFetched: true,
-      }));
-    },
-    [contextOnError, transformResponse]
-  );
+        setData((oldData) => ({
+          ...oldData,
+          success: false,
+          response,
+          fetching: false,
+          fetched: true,
+          firstTimeFetched: true,
+        }));
+      },
+      [contextOnError, transformResponse],
+    );
+
+  const checkParams = (payload: RequestPayload<T>) => {
+    if (payload.url === undefined && contextURL) {
+      throw Error(
+        "@reactivers/use-fetch => URL is undefined. Make sure you defined the url in the context or hook!",
+      );
+    }
+    if (payload.endpoint === undefined) {
+      throw Error(
+        "@reactivers/use-fetch => Endpoint is undefined. If you don't want to use it pass empty string",
+      );
+    }
+  };
 
   const request = useCallback(
-    (payload: RequestPayload = {}) => {
+    (payload: RequestPayload<T>) => {
+      checkParams(payload);
       const {
         url: _url,
         endpoint,
@@ -115,24 +114,27 @@ const useFetch: <T extends {}>(
 
       setData((old) => ({ ...old, fetching: true, fetched: false }));
 
-      const authorizationHeader = getAuthorizationHeader();
-      const headers = {
+      const authorizationHeader = getAuthorizationHeader
+        ? getAuthorizationHeader()
+        : undefined;
+
+      const headers: Record<string, string | undefined> = {
         Authorization: authorizationHeader,
-        ...(payloadHeaders || {}),
+        ...((payloadHeaders || {}) as Record<string, string | undefined>),
       };
 
       if (!headers["Authorization"]) delete headers["Authorization"];
 
-      return iFetch({
+      return iFetch<T>({
         ...rest,
         url,
-        headers,
+        headers: headers as HeadersInit,
         credentials: _credentials || credentials,
         onSuccess: (response) => {
           if (!isSuccess || isSuccess(response)) {
             onSuccess({
               onSuccess: payloadOnSuccess,
-              response,
+              response: response as T,
             });
           } else {
             onError({
@@ -145,12 +147,12 @@ const useFetch: <T extends {}>(
           if (!isError || isError(response)) {
             onError({
               onError: payloadOnError,
-              response,
+              response: response as T,
             });
           } else {
             onSuccess({
               onSuccess: payloadOnSuccess,
-              response,
+              response: response as T,
             });
           }
         },
@@ -168,7 +170,7 @@ const useFetch: <T extends {}>(
       setData,
       onRequest,
       abortController.signal,
-    ]
+    ],
   );
 
   useEffect(() => {
@@ -180,7 +182,7 @@ const useFetch: <T extends {}>(
   return {
     request,
     ...data,
-  };
+  } as IUseFetchResponse<T>;
 };
 
 export default useFetch;

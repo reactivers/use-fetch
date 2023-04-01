@@ -1,30 +1,28 @@
 import { useCallback } from "react";
-import { applicationJSONHeader } from "../../utils/functions";
-import useFetch, {
-  RequestPayload,
+import { applicationJSONHeader } from "../../utils/constants";
+import {
+  IFetchJSONType,
   IUseFetchProps,
   IUseFetchResponse,
-} from "../useFetch";
+  RequestPayload,
+} from "../../utils/types";
+import useFetch from "../useFetch";
 
-interface DeleteRequestPayload extends RequestPayload {
-  params?: any;
-}
-
-const useDelete: <T extends {}>(
-  params?: IUseFetchProps
-) => IUseFetchResponse<T> = <T extends {}>(
-  params = { abortOnUnmount: true }
+const useDelete: <T extends IFetchJSONType>(
+  params?: IUseFetchProps,
+) => IUseFetchResponse<T> = <T extends IFetchJSONType>(
+  params?: IUseFetchProps,
 ) => {
   const { request, ...rest } = useFetch<T>(params);
   const deleteRequest = useCallback(
-    (payload: DeleteRequestPayload = {}) => {
+    (payload: RequestPayload<T>) => {
       return request({
         headers: applicationJSONHeader,
         ...payload,
         method: "DELETE",
       });
     },
-    [request]
+    [request],
   );
 
   return {
