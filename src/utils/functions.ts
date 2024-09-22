@@ -18,7 +18,10 @@ export const iFetch = async <T extends IFetchResponseType>(
     throw new Error("No URL Found in the request");
   }
 
-  const body = stringify ? JSON.stringify(_body) : _body;
+  const body = (stringify ? JSON.stringify(_body) : _body) as
+    | string
+    | null
+    | undefined;
 
   try {
     const _httpResponse = await fetch(url, {

@@ -33,7 +33,9 @@ export interface IFetchOnError {
   (error: never | unknown): void;
 }
 
-export interface IFetch<T extends IFetchJSONType> extends RequestInit {
+export interface IFetch<T extends IFetchJSONType>
+  extends Omit<RequestInit, "body"> {
+  body?: Record<string | number | symbol, unknown> | BodyInit | null;
   url: string;
   onSuccess: (response: T) => void;
   onError(error: never | unknown): void;
